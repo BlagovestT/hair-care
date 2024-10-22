@@ -1,20 +1,14 @@
-import { createContext, useState } from "react";
+import React, { createContext, useState } from "react";
 
 export const QuizContext = createContext();
 
 export const QuizProvider = ({ children }) => {
-  const [answers, setAnswers] = useState({
-    hairType: "",
-    washFrequency: "",
-    benefits: "",
-    troubles: "",
-    hairColor: "",
-  });
+  const [answers, setAnswers] = useState({});
 
-  const updateAnswer = (question, answer) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [question]: answer,
+  const updateAnswer = (questionKey, answer) => {
+    setAnswers((prevAnswers) => ({
+      ...prevAnswers,
+      [questionKey]: answer,
     }));
   };
 

@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 import { QuizContext } from "../context/QuizContext";
 
@@ -34,7 +33,7 @@ const questions = [
       "Soothing dry scalp",
       "Repairs the appearance of damaged hair",
       "Volume",
-      "Curl and coil enhancing.",
+      "Curl and coil enhancing",
     ],
   },
   {
@@ -54,12 +53,14 @@ const questions = [
 const QuestionPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const currentQuestion = questions[parseInt(id) - 1];
   const { updateAnswer } = useContext(QuizContext);
+
+  const currentQuestion = questions[parseInt(id) - 1];
   const [selectedOption, setSelectedOption] = useState(null);
 
   const progress = (parseInt(id) / questions.length) * 100;
 
+  // Handle navigation to the next question
   const handleNext = () => {
     if (selectedOption) {
       updateAnswer(currentQuestion.questionKey, selectedOption);
@@ -78,43 +79,65 @@ const QuestionPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div style={{ width: 100, marginBottom: "20px" }}>
-        <CircularProgressbar
-          value={progress}
-          text={`${id}/${questions.length}`}
-        />
-      </div>
+    // Main container for the question page layout
+    <div className="flex justify-center items-center min-h-screen">
+      {/* Inner container to hold the question and options */}
+      <div className="flex flex-col justify-center items-center gap-8 w-full pl-[260px]">
+        <div className="w-[583px] h-[88px] text-center">
+          <h2 className="font-poppins text-[40px] font-normal leading-tight">
+            {currentQuestion.text}
+          </h2>
+        </div>
 
-      <h2>{currentQuestion.text}</h2>
+        {/* Options list */}
+        <div className="flex flex-row flex-wrap gap-[14px] justify-center max-w-[985px]">
+          {currentQuestion.options.map((option, idx) => (
+            <button
+              key={idx}
+              onClick={() => setSelectedOption(option)}
+              className={`pl-[20px] pr-[40px] py-[14px] border font-roboto text-left leading-tight rounded-[8px] min-w-[180px] h-[44px] ${
+                selectedOption === option
+                  ? "bg-[#AADDF3] border-[#5BC1ED] text-[#EEF7FB]"
+                  : "border-[#5BC1ED] text-gray-600"
+              } whitespace-nowrap overflow-hidden text-ellipsis`}
+            >
+              {`${String.fromCharCode(97 + idx)}. ${option}`}{" "}
+            </button>
+          ))}
+        </div>
 
-      <div className="options">
-        {currentQuestion.options.map((option, idx) => (
+        <div className="flex flex-row w-[244px] h-[48px] gap-6">
           <button
-            key={idx}
-            onClick={() => setSelectedOption(option)}
-            className="btn-option"
+            onClick={handlePrevious}
+            className="text-[#677487] text-[16px] underline text-lg cursor-pointer"
           >
-            {option}
+            Back
           </button>
-        ))}
+          <button
+            onClick={handleNext}
+            className="bg-[#C3EDFF] text-[#1C2635] font-semibold text-lg w-[189px] h-[48px] rounded-[8px] shadow-md transition-opacity hover:opacity-80 cursor-pointer"
+            disabled={!selectedOption}
+          >
+            Next question →
+          </button>
+        </div>
       </div>
 
-      <div className="flex justify-between w-full mt-4">
-        <button
-          onClick={handlePrevious}
-          disabled={parseInt(id) === 1}
-          className="bg-gray-500 text-white py-2 px-4 rounded disabled:opacity-50"
-        >
-          Previous
-        </button>
-
-        <button
-          onClick={handleNext}
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-        >
-          Next
-        </button>
+      {/* Progress bar */}
+      <div className="flex w-[260px]">
+        <div className="w-[101px] h-[101px] mb-40">
+          <CircularProgressbar
+            value={progress}
+            text={`${id}/${questions.length}`}
+            styles={buildStyles({
+              textSize: "20px",
+              textColor: "#1C2635",
+              trailColor: "#AADDF3",
+              backgroundColor: "#EEF7FB",
+            })}
+            strokeWidth={5}
+          />
+        </div>
       </div>
     </div>
   );
